@@ -17,6 +17,7 @@
 */
 
 
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -27,12 +28,14 @@ if (!defined('ABSPATH')) {
  */
 
 if (!class_exists('Split_Traffic_A_B_Testing')) {
+
+    require_once plugin_dir_path(__FILE__) . '/include/Helpers.php';
+
     class Split_Traffic_A_B_Testing
     {
-        private $plugin_version = '1.0.0';
-        private $last_name = 'Djukovic';
-        private $plugin_name = 'split_traffic_a_b_testing';
-        private $plugin_name_pretty = 'A/B Split Testing';
+
+        use Helpers;
+        
         private $table_version = 1;
 
         public function __construct()
@@ -41,7 +44,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
 
             if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic') {
-                add_action('init', [$this, 'my_plugin_redirect']);
+                add_action('init', [$this, 'redirect_a_b']);
             }
             if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic' || basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'experiment-a-djukovic') {
                 // adding stylesheet and script
@@ -58,10 +61,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             add_filter('script_loader_tag', function ($tag, $handle, $src) {
 
                 switch ($handle) {
-                    case $this->plugin_name . '-script':
+                    case SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
                         return '<script type="module" src="' . esc_url($src) . '"></script>';
                         break;
-                    case 'admin-' . $this->plugin_name . '-script':
+                    case 'admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
                         return '<script type="module" src="' . esc_url($src) . '"></script>';
                         break;
                     default:
@@ -82,11 +85,11 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_styles'], 100, 0);
                 add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_scripts'], 100, 0);
             }
-              // Add settings link to plugin row
+            // Add settings link to plugin row
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'my_plugin_settings_link']);
 
             // Add settings link to plugin details
-            add_filter('plugin_row_meta', [$this,'my_plugin_info_settings_link'], 10, 2);
+            add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
         }
 
 
@@ -101,7 +104,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             return $links;
         }
 
-      
+
 
 
         public function my_plugin_settings_link($links)
@@ -159,8 +162,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         {
 
             $js_path = plugins_url('assets/js/Admin_App.js', __FILE__);
-            wp_register_script('admin-' . $this->plugin_name . '-script', $js_path, array(), $this->plugin_version);
-            wp_enqueue_script('admin-' . $this->plugin_name . '-script');
+            wp_register_script('admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script', $js_path, array(), SPLIT_TRAFFIC_A_B_TESTING_VERSION);
+            wp_enqueue_script('admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script');
         }
 
 
@@ -171,9 +174,9 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             $stylesheet_path = plugins_url('assets/css/admin-styles.css', __FILE__);
 
-            wp_register_style('admin-' . $this->plugin_name . '-styles', $stylesheet_path, array(), $this->plugin_version, 'all');
+            wp_register_style('admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-styles', $stylesheet_path, array(), SPLIT_TRAFFIC_A_B_TESTING_VERSION, 'all');
 
-            wp_enqueue_style('admin-' . $this->plugin_name . '-styles');
+            wp_enqueue_style('admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-styles');
         }
 
 
@@ -191,10 +194,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
 
             add_menu_page(
-                $this->plugin_name_pretty,
-                $this->plugin_name_pretty,
+                SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY_2,
+                SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY_2,
                 'manage_options',
-                $this->plugin_name,
+                SPLIT_TRAFFIC_A_B_TESTING_NAME,
                 [$this, 'split_traffic_a_b_testing_plugin_options'],
                 'data:image/svg+xml;base64,' . $base64EncodedSVG, //'dashicons-image-flip-horizontal'
                 100
@@ -266,7 +269,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             global $wpdb;
 
             // Define your custom table name
-            $table_name = $wpdb->prefix . $this->plugin_name;
+            $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
 
             // Validate and sanitize form data
             $data_to_update = [
@@ -276,12 +279,12 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             ];
 
             $where_condition = array(
-                'table_version' => $this->table_version
+                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
             );
 
             global $wpdb;
 
-            $table_name_unique = $wpdb->prefix . $this->plugin_name . '_unique_users';
+            $table_name_unique = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . '_unique_users';
 
             $wpdb->update($table_name, $data_to_update, $where_condition);
 
@@ -304,7 +307,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
 
-            $sql = $wpdb->prepare("SELECT * FROM $table_name_unique WHERE `table_version` = $this->table_version");
+            $sql = $wpdb->prepare("SELECT * FROM $table_name_unique WHERE `table_version` = ".SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION );
 
             $results = $wpdb->get_results($sql, OBJECT);
 
@@ -320,7 +323,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 );
 
                 $where_condition_unique = array(
-                    'table_version' => $this->table_version,
+                    'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
                     'id' =>  $result->id
                 );
                 $wpdb->update($table_name_unique, $data_to_update_unique, $where_condition_unique);
@@ -369,8 +372,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             $stylesheet_path = plugins_url('assets/css/style.css', __FILE__);
 
-            wp_register_style($this->plugin_name . '-styles', $stylesheet_path, array(), $this->plugin_version);
-            wp_enqueue_style($this->plugin_name . '-styles');
+            wp_register_style(SPLIT_TRAFFIC_A_B_TESTING_NAME . '-styles', $stylesheet_path, array(), SPLIT_TRAFFIC_A_B_TESTING_VERSION);
+            wp_enqueue_style(SPLIT_TRAFFIC_A_B_TESTING_NAME . '-styles');
         }
 
         /**
@@ -381,8 +384,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         {
 
             $js_path = plugins_url('assets/js/App.js', __FILE__);
-            wp_register_script($this->plugin_name . '-script', $js_path, array(), $this->plugin_version);
-            wp_enqueue_script($this->plugin_name . '-script');
+            wp_register_script(SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script', $js_path, array(), SPLIT_TRAFFIC_A_B_TESTING_VERSION);
+            wp_enqueue_script(SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script');
         }
 
 
@@ -437,7 +440,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
             $where_condition = array(
-                'table_version' => $this->table_version
+                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
             );
 
             $wpdb->update($table_name, $data_to_update, $where_condition);
@@ -460,8 +463,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             // Define the field you want to retrieve
             $desired_field_unique = 'username, expiration_date, created_at';
             $username = wp_get_current_user()->user_login;
-            $condition = "table_version=" . $this->table_version . " AND username='" . $username . "'";
-
+            $condition = "table_version=" . SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION . " AND username='" . $username . "'";
+    
             $db_return_values_unique = $this->return_database_results($desired_field_unique, 'get_results', $condition, true);
 
             $wpdb_unique           = $db_return_values_unique[0];
@@ -470,13 +473,13 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             $result_unique         = $db_return_values_unique[3];
 
             $currentDateTime = date('Y-m-d H:i:s');
-
+            print_r($result_unique);
             if (empty($result_unique)) {
 
                 $wpdb->insert(
                     $table_name_unique,
                     array(
-                        'table_version' => $this->table_version,
+                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
                         'username' => $username,
                         'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
                         'created_at' => $currentDateTime
@@ -497,7 +500,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 }
 
                 $where_condition = array(
-                    'table_version' =>  $this->table_version
+                    'table_version' =>  SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
                 );
 
                 $wpdb->update($table_name, $data_to_update, $where_condition);
@@ -545,14 +548,14 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                     }
 
                     $where_condition = array(
-                        'table_version' => $this->table_version
+                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
                     );
 
                     $wpdb->update($table_name, $data_to_update, $where_condition);
 
                     $where_condition_unique = array(
                         'username' => $username,
-                        'table_version' => $this->table_version
+                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
                     );
                     $wpdb->update($table_name_unique, $data_to_update_unique, $where_condition_unique);
 
@@ -610,7 +613,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
             $where_condition = array(
-                'table_version' => $this->table_version
+                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
             );
 
             $wpdb->update($table_name, $data_to_update, $where_condition);
@@ -623,35 +626,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
         }
 
-        private function return_database_results($desired_field, $method, $condition = 1, $unique_pointer = false)
-        {
-
-            global $wpdb;
-            $pointer = '';
-            if ($unique_pointer) {
-                $pointer = '_unique_users';
-            }
-
-            // Define your custom table name
-            $table_name = $wpdb->prefix . $this->plugin_name . $pointer;
-
-            // Your SQL query to retrieve the field value
-            $sql = $wpdb->prepare("SELECT $desired_field FROM $table_name WHERE $condition");
-
-
-            // Get the result from the database
-            if ($method === 'get_var') {
-                $result = $wpdb->get_var($sql);
-            } else if ($method === 'get_results') {
-                $result = $wpdb->get_results($sql, OBJECT);
-            }
-
-
-
-            return [$wpdb, $table_name, $sql, $result];
-        }
-
-        public function my_plugin_redirect()
+        public function redirect_a_b()
         {
 
 
@@ -668,18 +643,18 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             $result         = $db_return_values[3];
 
 
-            if ($result === 'Control - ' . $this->last_name) {
+            if ($result === 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING) {
                 $data_to_update = array(
-                    $desired_field => 'Experiment A - ' . $this->last_name,
+                    $desired_field => 'Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
                 );
             } else {
                 $data_to_update = array(
-                    $desired_field => 'Control - ' . $this->last_name,
+                    $desired_field => 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
                 );
             }
 
             $where_condition = array(
-                'table_version' => $this->table_version
+                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
             );
 
             $wpdb->update($table_name, $data_to_update, $where_condition);
@@ -699,8 +674,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
                 wp_redirect($page_url);
                 exit();
-            } else {
-            }
+            } 
         }
 
 
@@ -713,167 +687,28 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             self::create_database_table();
         }
 
+        
         public static function deactivate()
         {
             self::delete_page_by_name('Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING);
             self::delete_page_by_name('Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING);
         }
 
+
+
         public static function uninstall()
         {
             self::remove_database_table();
-        }
-
-
-
-        private static function remove_database_table()
-        {
-            global $wpdb;
-
-            $table_name_unique = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . '_unique_users';
-            $sql_unique = "DROP TABLE IF EXISTS $table_name_unique";
-            $wpdb->query($sql_unique);
-
-
-            $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
-            $sql = "DROP TABLE IF EXISTS $table_name";
-            $wpdb->query($sql);
-
-            
-        }
-
-        public static function create_database_table()
-        {
-
-
-            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
-            global $wpdb;
-
-            $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
-
-            $charset_collate = $wpdb->get_charset_collate();
-
-            if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-
-                $sql = "CREATE TABLE $table_name (
-                        table_version int(9) DEFAULT 1 NOT NULL,
-                        next_redirect text NOT NULL,
-                        control_traffic_counter int(9) DEFAULT 0 NOT NULL,
-                        experiment_traffic_counter int(9) DEFAULT 0 NOT NULL,
-                        control_conversation_counter int(9) DEFAULT 0 NOT NULL,
-                        experiment_conversation_counter int(9) DEFAULT 0 NOT NULL,
-                        control_unique_conversation_counter int(9) DEFAULT 0 NOT NULL,
-                        experiment_unique_conversation_counter int(9) DEFAULT 0 NOT NULL,
-                        amount_for_unique_expiry INT DEFAULT 30 CHECK (amount_for_unique_expiry >= 0 AND amount_for_unique_expiry <= 60),
-                        unit_for_unique_expiry text DEFAULT 'days' NOT NULL,
-                        PRIMARY KEY (table_version)
-                    ) $charset_collate;";
-
-
-
-
-                dbDelta($sql);
-
-                $wpdb->insert(
-                    $table_name,
-                    array(
-                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                        'next_redirect' => 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
-                    )
-                );
-            }
-
-            $table_name_unique = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . '_unique_users';
-            if ($wpdb->get_var("SHOW TABLES LIKE '$table_name_unique'") != $table_name_unique) {
-                $sql_unique = "CREATE TABLE $table_name_unique (
-                    id int(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                    table_version int NOT NULL,
-                    username text NOT NULL,
-                    expiration_date TIMESTAMP,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (table_version) REFERENCES $table_name(table_version)
-                ) $charset_collate;";
-
-                dbDelta($sql_unique);
-            }
-        }
-
-        public static function create_page(string $page_title, string $conversation_pointer)
-        {
-
-
-
-
-            if (self::get_page_by_name($page_title)) {
-                $page_args = array(
-                    'post_title'    =>  $page_title,
-                    'post_content'  =>  '',
-                    'post_status'   => 'publish',
-                    'post_type'     => 'page',
-                    'page_template' => ''
-                );
-            }
-
-
-            // Insert the page into the database
-            wp_insert_post($page_args);
-        }
-
-        public static function get_page_by_name($name)
-        {
-
-
-            $query = self::prepare_query_args($name);
-
-            if (!empty($query->post)) {
-                return false;
-            }
-
-            return true;
-        }
-
-        public static function delete_page_by_name($name)
-        {
-
-
-            $query = self::prepare_query_args($name);
-
-            if ($query->have_posts()) {
-                try {
-                    wp_delete_post($query->post->ID, true);
-                } catch (\Throwable $th) {
-                    return false;
-                }
-            }
-        }
-
-        public static function prepare_query_args($name)
-        {
-            $query = new WP_Query(
-                [
-                    'post_type'              => 'page',
-                    'name'                   => $name,
-                    'post_status'            => 'any',
-                    'posts_per_page'         => 1,
-                    'no_found_rows'          => true,
-                    'ignore_sticky_posts'    => true,
-                    'update_post_term_cache' => false,
-                    'update_post_meta_cache' => false,
-                    'orderby'                => 'post_date ID',
-                    'order'                  => 'ASC',
-                ]
-            );
-
-            return $query;
         }
     }
 }
 
 // Register activation, deactivation, and uninstall hooks
 if (class_exists('Split_Traffic_A_B_Testing')) {
+    
     register_activation_hook(__FILE__, array('Split_Traffic_A_B_Testing', 'activate'));
     register_deactivation_hook(__FILE__, array('Split_Traffic_A_B_Testing', 'deactivate'));
     register_uninstall_hook(__FILE__, array('Split_Traffic_A_B_Testing', 'uninstall'));
+
     $Split_Traffic_A_B_Testing = new Split_Traffic_A_B_Testing();
 }
