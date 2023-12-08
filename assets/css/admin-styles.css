@@ -1,0 +1,151 @@
+table,
+td,
+th {
+    border: 1px solid #333;
+
+}
+
+table {
+    width: 100%;
+}
+
+td {
+    text-align: center;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 32px;
+}
+
+thead,
+tfoot {
+    font-size: 18px;
+    background-color: #333;
+    color: #fff;
+
+}
+
+thead th {
+    background-color: #333;
+    padding: 1rem;
+}
+
+th {
+    background-color: rgb(186, 186, 186);
+}
+
+td,
+th {
+    width: 50%;
+    padding: 0.5rem;
+    overflow: hidden;
+}
+
+.df {
+    display: flex;
+}
+.aic {
+    align-items: center;
+}
+
+.fdc {
+    flex-direction: column;
+}
+
+.jcfs {
+    justify-content: flex-start;
+}
+
+.w100 {
+    width: 100%;
+}
+
+.f1 {
+    flex: 1;
+}
+
+.aic {
+    align-items: center;
+}
+
+.g1 {
+    gap: 1rem;
+}
+
+.b1 {
+    border: 1px solid rgba(6, 4, 3, 0.1);
+}
+
+.p1rem {
+    padding: 1rem;
+}
+
+.p1dot5rem {
+    padding: 0.5rem;
+}
+
+.ripple {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.ripple div {
+    position: absolute;
+    border: 4px solid #fff;
+    opacity: 1;
+    border-radius: 50%;
+    animation: ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.ripple div:nth-child(2) {
+    animation-delay: -0.5s;
+}
+
+@keyframes ripple {
+    0% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    4.9% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+
+    5% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+
+    100% {
+        top: 0px;
+        left: 0px;
+        width: 72px;
+        height: 72px;
+        opacity: 0;
+    }
+}
+
+dialog {
+    background: #72b172;
+    border-radius: 8px;
+    border-width: 2px;
+    border-color: rgba(6, 4, 3, .1);
+    box-shadow: 0 0 8px;
+    backdrop-filter: blur(18px);
+}
+
+dialog::backdrop {
+    backdrop-filter: blur(5px);
+}
+#value_amoutn{ font-size: 15px;}
