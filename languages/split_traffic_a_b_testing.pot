@@ -1,0 +1,98 @@
+# Copyright (C) 2013 
+# This file is distributed under the same license as the package
+
+msgid ""
+msgstr ""
+"Project-Id-Version:  \n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/exit-intent\n"
+"POT-Creation-Date: 2013-05-21 09:44:12+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: page-template.php:2
+msgid "Conversation"
+msgstr ""
+
+#: admin-template.php:2
+msgid "A/B Split Trafic Testing"
+msgstr ""
+
+#: admin-template.php:3
+msgid "In settings you can see trafic, conversion and unique conversion counters for Control and Experiment page"
+msgstr ""
+
+#: admin-template.php:7
+msgid "Trafic Counter"
+msgstr ""
+
+#: admin-template.php:12
+msgid "Number of landings control page:"
+msgstr ""
+
+#: admin-template.php:13
+msgid "Number of landings experiment page:"
+msgstr ""
+
+#: admin-template.php:25
+msgid "Conversation counter"
+msgstr ""
+
+#: admin-template.php:30
+msgid "Number of conversations control page:"
+msgstr ""
+
+#: admin-template.php:31
+msgid "Number of conversations experiment page:"
+msgstr ""
+
+#: admin-template.php:43
+msgid "The table header"
+msgstr ""
+
+#: admin-template.php:48
+msgid "Number of unique conversations control page:"
+msgstr ""
+
+#: admin-template.php:49
+msgid "Number of unique conversations experiment page:"
+msgstr ""
+
+#: admin-template.php:63
+msgid "Select amount of units for unique expiry:"
+msgstr ""
+
+#: admin-template.php:69
+msgid "Select time value type for uniqe expiry:"
+msgstr ""
+
+#: admin-template.php:76
+msgid "seconds"
+msgstr ""
+
+#: admin-template.php:76
+msgid "minutes"
+msgstr ""
+
+#: admin-template.php:76
+msgid "hours"
+msgstr ""
+
+#: admin-template.php:76
+msgid "days"
+msgstr ""
+
+#: admin-template.php:76
+msgid "weeks"
+msgstr ""
+
+#: admin-template.php:76
+msgid "months"
+msgstr ""
+
+#: admin-template.php:87
+msgid "Submit"
+msgstr ""

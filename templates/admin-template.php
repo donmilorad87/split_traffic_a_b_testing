@@ -1,29 +1,16 @@
 <div class="df fdc wrap">
-
-    $args = array(
-    'amount_for_unique_expiry' => $amount_for_unique_expiry,
-    'unit_for_unique_expiry' => $unit_for_unique_expiry,
-    'unit_for_unique_expiry_types' => [
-    'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'
-    ],
-    'control_traffic_counter' => $control_traffic_counter,
-    'experiment_traffic_counter' => $experiment_traffic_counter,
-    'control_conversation_counter' => $control_conversation_counter,
-    'experiment_conversation_counter' => $experiment_conversation_counter,
-    'control_unique_conversation_counter' => $control_unique_conversation_counter,
-    'experiment_unique_conversation_counter' => $experiment_unique_conversation_counter
-    );
-
+    <h3><?php _e('A/B Split Trafic Testing', 'split_traffic_a_b_testing') ?></h3>
+    <p> <?php _e('In settings you can see trafic, conversion and unique conversion counters for Control and Experiment page', 'split_traffic_a_b_testing') ?></p>
     <table>
         <thead>
             <tr>
-                <th colspan="2">Trafic Counter</th>
+                <th colspan="2"><?php _e('Trafic Counter', 'split_traffic_a_b_testing') ?></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>control_traffic_counter</td>
-                <td>experiment_traffic_counter</td>
+                <th><?php _e('Number of landings control page:', 'split_traffic_a_b_testing') ?></th>
+                <th><?php _e('Number of landings experiment page:', 'split_traffic_a_b_testing') ?></th>
             </tr>
             <tr>
                 <td><?php echo $args['control_traffic_counter']; ?></td>
@@ -35,13 +22,13 @@
     <table>
         <thead>
             <tr>
-                <th colspan="2">Conversation counter</th>
+                <th colspan="2"><?php _e('Conversation counter', 'split_traffic_a_b_testing') ?></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>control_conversation_counter</td>
-                <td>experiment_conversation_counter</td>
+                <th><?php _e('Number of conversations control page:', 'split_traffic_a_b_testing') ?></th>
+                <th><?php _e('Number of conversations experiment page:', 'split_traffic_a_b_testing') ?></th>
             </tr>
             <tr>
                 <td><?php echo $args['control_conversation_counter']; ?></td>
@@ -53,13 +40,13 @@
     <table>
         <thead>
             <tr>
-                <th colspan="2">The table header</th>
+                <th colspan="2"><?php _e('The table header', 'split_traffic_a_b_testing') ?></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>control_unique_conversation_counter</td>
-                <td>experiment_unique_conversation_counter</td>
+                <th><?php _e('Number of unique conversations control page:', 'split_traffic_a_b_testing') ?></th>
+                <th><?php _e('Number of unique conversations experiment page:', 'split_traffic_a_b_testing') ?></th>
             </tr>
             <tr>
                 <td><?php echo $args['control_unique_conversation_counter']; ?></td>
@@ -68,33 +55,34 @@
         </tbody>
     </table>
     <br>
-   
 
-    <div>
-        <form action="">
-            <label for="amount_for_unique_expiry">Select a value: <span id="value_amoutn"></span></label>
+
+    <div class="df aic g2 b1 p1rem">
+
+        <div class="df fdc p1dot5rem b1 f1">
+            <label for="amount_for_unique_expiry"><?php _e('Select amount of units for unique expiry:', 'split_traffic_a_b_testing') ?>
+                <strong id="value_amoutn"><?php echo $args['amount_for_unique_expiry']; ?></strong>
+            </label>
             <input type="range" id="amount_for_unique_expiry" name="amount_for_unique_expiry" min="1" max="60" step="1" value="<?php echo $args['amount_for_unique_expiry']; ?>">
-
+        </div>
+        <div class="df fdc p1dot5rem b1 f1">
+            <label for="unit_for_unique_expiry"><?php _e('Select time value type for uniqe expiry:', 'split_traffic_a_b_testing') ?></label>
             <select id="unit_for_unique_expiry" name="unit_for_unique_expiry">
 
-            <?php 
-            
+                <?php
+
                 foreach ($args['unit_for_unique_expiry_types'] as $value) {
-                    if($value === $args['unit_for_unique_expiry']){
-                        echo '<option value="'. $value .'" selected>'. ucfirst($value) .'</option>';
-                    }else {
-                        echo '<option value="'. $value .'">'. ucfirst($value) .'</option>';
-                    }
-                   
-                    
+
+                    echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
                 }
 
-            ?>
-       
+                ?>
+
 
             </select>
-            <input type="button" value="Submit" id="submit_new_values_for_expiry">
-        </form>
+        </div>
+        <input type="button" value="<?php _e('Submit', 'split_traffic_a_b_testing') ?>" class="f1 button button-primary button-large" id="submit_new_values_for_expiry">
+
 
 
     </div>

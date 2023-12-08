@@ -242,7 +242,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 'amount_for_unique_expiry'                  => $amount_for_unique_expiry,
                 'unit_for_unique_expiry'                    => $unit_for_unique_expiry,
                 'unit_for_unique_expiry_types'              => [
-                    'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'
+                    'seconds', 'minutes', 'hours', 'days', 'weeks', 'months'
                 ],
                 'control_traffic_counter'                    => $control_traffic_counter,
                 'experiment_traffic_counter'                 => $experiment_traffic_counter,

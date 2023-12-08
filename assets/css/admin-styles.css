@@ -71,6 +71,9 @@ th {
     gap: 1rem;
 }
 
+.g2 {
+    gap: 2rem;
+}
 .b1 {
     border: 1px solid rgba(6, 4, 3, 0.1);
 }
@@ -148,4 +151,4 @@ dialog {
 dialog::backdrop {
     backdrop-filter: blur(5px);
 }
-#value_amoutn{ font-size: 15px;}
+#value_amoutn{ font-size: 20px;}
