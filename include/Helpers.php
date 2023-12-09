@@ -3,7 +3,6 @@
 trait Helpers
 {
  
-
     private static function return_database_results($desired_field, $method, $condition = 1, $unique_pointer = false)
     {
         
@@ -17,7 +16,7 @@ trait Helpers
         $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . $pointer;
 
         // Your SQL query to retrieve the field value
-        $sql = $wpdb->prepare("SELECT $desired_field FROM $table_name WHERE $condition");
+        $sql = $wpdb->prepare("SELECT $desired_field FROM $table_name WHERE %s", $condition);
 
 
         // Get the result from the database
@@ -74,7 +73,6 @@ trait Helpers
 
     private static function get_page_by_name($name)
     {
-
 
         $query = self::prepare_query_args($name);
 

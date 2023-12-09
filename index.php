@@ -41,11 +41,19 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         public function __construct()
         {
             $this->define_constants();
-            add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
+
+            add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
 
             if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic') {
                 add_action('init', [$this, 'redirect_a_b']);
             }
+
+            add_action('wp', [$this, 'page_traffic_counter']);
+
+            add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
+
+            add_action('wp',  [$this, 'setWpAdminAjaxCookie'], 100, 0);
+
             if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic' || basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'experiment-a-djukovic') {
                 // adding stylesheet and script
                 add_action('wp_enqueue_scripts', [$this, 'add_split_traffic_a_b_testing_stylesheet'], 100, 0);
@@ -53,9 +61,6 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
                 add_action('the_content', [$this, 'add_page_template'], 100, 1);
             }
-            add_action('wp', [$this, 'page_traffic_counter']);
-
-
 
             // because plugin is using OOP javascript type="module" is needed. When JS is using type="module" (OOP) it becomes hard to control script from developer panel
             add_filter('script_loader_tag', function ($tag, $handle, $src) {
@@ -74,12 +79,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }, 10, 3);
 
 
-
-            add_action('wp',  [$this, 'setWpAdminAjaxCookie'], 100, 0);
-
             add_action('admin_menu', [$this, 'split_traffic_a_b_testing_plugin_menu'], 100, 0);
-
-            add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
 
             if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'admin.php?page=split_traffic_a_b_testing') {
                 add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_styles'], 100, 0);
@@ -90,6 +90,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             // Add settings link to plugin details
             add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
+            
         }
 
         /**
@@ -126,8 +127,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             define('SPLIT_TRAFFIC_A_B_TESTING_VERSION', '1.0.0');
             define('SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION', 1);
             define('SPLIT_TRAFFIC_A_B_TESTING_NAME', 'split_traffic_a_b_testing');
-            define('SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY', 'Split Traffic A/B Testing');
-            define('SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY_2', 'A/B Split Testing');
+            define('SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY', __('A/B Split Traffic Testing', 'split_traffic_a_b_testing'));
+            define('SPLIT_TRAFFIC_A_B_TESTING_NAME_PRETTY_2', __('A/B Split Testing', 'split_traffic_a_b_testing'));
             define('SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING', 'Djukovic');
         }
 
@@ -297,7 +298,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
 
-            $sql = $wpdb->prepare("SELECT * FROM $table_name_unique WHERE `table_version` = " . SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION);
+            $sql = $wpdb->prepare("SELECT * FROM $table_name_unique WHERE `table_version` = %d", SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION);
 
             $results = $wpdb->get_results($sql, OBJECT);
 
