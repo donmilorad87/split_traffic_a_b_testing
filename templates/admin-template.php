@@ -71,10 +71,10 @@
 
                 <?php
 
-                foreach ($args['unit_for_unique_expiry_types'] as $value) {
+                    foreach ($args['unit_for_unique_expiry_types'] as $value) {
 
-                    echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
-                }
+                        echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
+                    }
 
                 ?>
 

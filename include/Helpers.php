@@ -59,13 +59,13 @@ trait Helpers
 
 
         if (self::get_page_by_name($page_title)) {
-            $page_args = array(
+            $page_args = [
                 'post_title'    =>  $page_title,
                 'post_content'  =>  '',
                 'post_status'   => 'publish',
                 'post_type'     => 'page',
                 'page_template' => ''
-            );
+            ];
         }
 
 
@@ -94,9 +94,9 @@ trait Helpers
 
         global $wpdb;
 
-        $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
-
         $charset_collate = $wpdb->get_charset_collate();
+
+        $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
 
         if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
 
@@ -114,23 +114,21 @@ trait Helpers
                         PRIMARY KEY (table_version)
                     ) $charset_collate;";
 
-
-
-
             dbDelta($sql);
 
             $wpdb->insert(
                 $table_name,
-                array(
+                [
                     'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                    'next_redirect' => 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
-                )
+                    'next_redirect' => 'Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
+                ]
             );
         }
 
         $table_name_unique = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . '_unique_users';
 
         if ($wpdb->get_var("SHOW TABLES LIKE '$table_name_unique'") != $table_name_unique) {
+
             $sql_unique = "CREATE TABLE $table_name_unique (
                     id int(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                     table_version int NOT NULL,

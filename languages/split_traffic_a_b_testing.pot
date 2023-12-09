@@ -13,86 +13,90 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: page-template.php:2
+#: templates/page-template.php:2
 msgid "Conversation link"
 msgstr ""
 
-#: admin-template.php:2
+#: templates/admin-template.php:2
 msgid "A/B Split Traffic Testing"
 msgstr ""
 
-#: admin-template.php:3
+#: templates/admin-template.php:3
 msgid "In settings you can see traffic, conversion and unique conversion counters for Control and Experiment page"
 msgstr ""
 
-#: admin-template.php:7
+#: templates/admin-template.php:7
 msgid "Traffic Counter"
 msgstr ""
 
-#: admin-template.php:12
+#: templates/admin-template.php:12
 msgid "Number of traffic landings on control page:"
 msgstr ""
 
-#: admin-template.php:13
+#: templates/admin-template.php:13
 msgid "Number of traffic landings on experiment page:"
 msgstr ""
 
-#: admin-template.php:25
+#: templates/admin-template.php:25
 msgid "Conversation counter"
 msgstr ""
 
-#: admin-template.php:30
+#: templates/admin-template.php:30
 msgid "Number of conversations on control page:"
 msgstr ""
 
-#: admin-template.php:31
+#: templates/admin-template.php:31
 msgid "Number of conversations on experiment page:"
 msgstr ""
 
-#: admin-template.php:43
+#: templates/admin-template.php:43
 msgid "Unique conversations"
 msgstr ""
 
-#: admin-template.php:48
+#: templates/admin-template.php:48
 msgid "Number of unique conversations on control page:"
 msgstr ""
 
-#: admin-template.php:49
+#: templates/admin-template.php:49
 msgid "Number of unique conversations on experiment page:"
 msgstr ""
 
-#: admin-template.php:63
+#: templates/admin-template.php:63
 msgid "Select amount of units for unique expiry:"
 msgstr ""
 
-#: admin-template.php:69
+#: templates/admin-template.php:69
 msgid "Select time value type for unique expiry:"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "seconds"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "minutes"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "hours"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "days"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "weeks"
 msgstr ""
 
-#: admin-template.php:76
+#: templates/admin-template.php:76
 msgid "months"
 msgstr ""
 
-#: admin-template.php:87
+#: templates/admin-template.php:87
 msgid "Submit"
+msgstr ""
+
+#: index.php:100
+msgid "Settings"
 msgstr ""
