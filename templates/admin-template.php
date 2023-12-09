@@ -1,6 +1,6 @@
 <div class="df fdc wrap">
-    <h3><?php _e('A/B Split Traffic Testing', 'split_traffic_a_b_testing') ?></h3>
-    <p> <?php _e('In settings you can see traffic, conversion and unique conversion counters for Control and Experiment page', 'split_traffic_a_b_testing') ?></p>
+    <h2><strong><?php _e('A/B Split Traffic Testing', 'split_traffic_a_b_testing') ?></strong></h2>
+    <h3> <?php _e('In settings you can see traffic, conversion and unique conversion counters for Control and Experiment page', 'split_traffic_a_b_testing') ?></h3>
     <table>
         <thead>
             <tr>
@@ -71,10 +71,10 @@
 
                 <?php
 
-                    foreach ($args['unit_for_unique_expiry_types'] as $value) {
+                foreach ($args['unit_for_unique_expiry_types'] as $value) {
 
-                        echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
-                    }
+                    echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
+                }
 
                 ?>
 

@@ -32,7 +32,6 @@ trait Helpers
         return [$wpdb, $table_name, $sql, $result];
     }
 
-
     private static function prepare_query_args($name)
     {   
        
@@ -54,7 +53,7 @@ trait Helpers
         return $query;
     }
 
-    private static function create_page(string $page_title, string $conversation_pointer)
+    private static function create_page(string $page_title)
     {
 
 

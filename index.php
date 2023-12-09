@@ -671,8 +671,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         public static function activate()
         {
 
-            self::create_page('Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING, 'control');
-            self::create_page('Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING, 'experiment');
+            self::create_page('Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING);
+            self::create_page('Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING);
             self::create_database_table();
         }
 
