@@ -105,6 +105,10 @@ msgstr ""
 msgid "A/B Split Testing"
 msgstr ""
 
-#: index.php:130
+#: index.php:136
 msgid "A/B Split Traffic Testing"
+msgstr ""
+
+#: index.php:137
+msgid "A/B Split Testing"
 msgstr ""

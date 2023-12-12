@@ -41,6 +41,18 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             $this->define_constants();
 
+            add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
+
+            add_action('admin_menu', [$this, 'split_traffic_a_b_testing_plugin_menu'], 100, 0);
+
+            // Add settings link to plugin row
+            add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'my_plugin_settings_link']);
+
+            // Add settings link to plugin details
+            add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
+
+
+
             if (
                 self::get_page_slug() === 'control-djukovic' ||
                 self::get_page_slug() === 'experiment-a-djukovic' ||
@@ -49,7 +61,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             ) {
 
 
-                add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
+
 
                 if (self::get_page_slug() === 'control-djukovic') {
                     add_action('init', [$this, 'redirect_a_b']);
@@ -86,17 +98,12 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 }, 10, 3);
 
 
-                add_action('admin_menu', [$this, 'split_traffic_a_b_testing_plugin_menu'], 100, 0);
+
 
                 if (self::get_page_slug() === 'admin.php?page=split_traffic_a_b_testing') {
                     add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_styles'], 100, 0);
                     add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_scripts'], 100, 0);
                 }
-                // Add settings link to plugin row
-                add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'my_plugin_settings_link']);
-
-                // Add settings link to plugin details
-                add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
             }
         }
         /**
