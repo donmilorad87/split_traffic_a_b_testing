@@ -18,8 +18,9 @@ export default class Admin_Split_Traffic_A_B_Testing {
             let url = window.location.href
             let amount_for_unique_expiry = document.querySelector('#amount_for_unique_expiry').value
             let unit_for_unique_expiry = document.querySelector('#unit_for_unique_expiry').value
+            let nonce = document.querySelector('#expiry_form').elements['_wp_http_referer'].value
 
-            let data = `amount_for_unique_expiry=${amount_for_unique_expiry}&unit_for_unique_expiry=${unit_for_unique_expiry}&submit=Submit`
+            let data = `amount_for_unique_expiry=${amount_for_unique_expiry}&unit_for_unique_expiry=${unit_for_unique_expiry}&nonce=${nonce}&submit=Submit`
             let loadingDialog = document.querySelector('#loadingDialog')
 
             loadingDialog.showModal()

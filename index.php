@@ -29,8 +29,6 @@ if (!defined('ABSPATH')) {
 
 if (!class_exists('Split_Traffic_A_B_Testing')) {
 
-
-
     class Split_Traffic_A_B_Testing
     {
 
@@ -40,59 +38,64 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
         public function __construct()
         {
-            $this->define_constants();
+            if (
+                self::get_page_slug() === 'control-djukovic' ||
+                self::get_page_slug() === 'experiment-a-djukovic' ||
+                self::get_page_slug() === 'admin.php?page=split_traffic_a_b_testing' ||
+                self::get_page_slug() === 'admin-ajax.php'
+            ) {
+                $this->define_constants();
 
-            add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
+                add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
 
-            if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic') {
-                add_action('init', [$this, 'redirect_a_b']);
-            }
-
-            add_action('wp', [$this, 'page_traffic_counter']);
-
-            add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
-
-            add_action('wp',  [$this, 'setWpAdminAjaxCookie'], 100, 0);
-
-            if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic' || basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'experiment-a-djukovic') {
-                // adding stylesheet and script
-                add_action('wp_enqueue_scripts', [$this, 'add_split_traffic_a_b_testing_stylesheet'], 100, 0);
-                add_action('wp_enqueue_scripts', [$this, 'add_split_traffic_a_b_testing_javascript'], 100, 0);
-
-                add_action('the_content', [$this, 'add_page_template'], 100, 1);
-            }
-
-            // because plugin is using OOP javascript type="module" is needed. When JS is using type="module" (OOP) it becomes hard to control script from developer panel
-            add_filter('script_loader_tag', function ($tag, $handle, $src) {
-
-                switch ($handle) {
-                    case SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
-                        return '<script type="module" src="' . esc_url($src) . '"></script>';
-                        break;
-                    case 'admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
-                        return '<script type="module" src="' . esc_url($src) . '"></script>';
-                        break;
-                    default:
-                        return $tag;
-                        break;
+                if (self::get_page_slug() === 'control-djukovic') {
+                    add_action('init', [$this, 'redirect_a_b']);
                 }
-            }, 10, 3);
+
+                add_action('wp', [$this, 'page_traffic_counter']);
+
+                add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
+
+                add_action('wp',  [$this, 'setWpAdminAjaxCookie'], 100, 0);
+
+                if (self::get_page_slug() === 'control-djukovic' || self::get_page_slug() === 'experiment-a-djukovic') {
+                    // adding stylesheet and script
+                    add_action('wp_enqueue_scripts', [$this, 'add_split_traffic_a_b_testing_stylesheet'], 100, 0);
+                    add_action('wp_enqueue_scripts', [$this, 'add_split_traffic_a_b_testing_javascript'], 100, 0);
+
+                    add_action('the_content', [$this, 'add_page_template'], 100, 1);
+                }
+
+                // because plugin is using OOP javascript type="module" is needed. When JS is using type="module" (OOP) it becomes hard to control script from developer panel
+                add_filter('script_loader_tag', function ($tag, $handle, $src) {
+
+                    switch ($handle) {
+                        case SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
+                            return '<script type="module" src="' . esc_url($src) . '"></script>';
+                            break;
+                        case 'admin-' . SPLIT_TRAFFIC_A_B_TESTING_NAME . '-script':
+                            return '<script type="module" src="' . esc_url($src) . '"></script>';
+                            break;
+                        default:
+                            return $tag;
+                            break;
+                    }
+                }, 10, 3);
 
 
-            add_action('admin_menu', [$this, 'split_traffic_a_b_testing_plugin_menu'], 100, 0);
+                add_action('admin_menu', [$this, 'split_traffic_a_b_testing_plugin_menu'], 100, 0);
 
-            if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'admin.php?page=split_traffic_a_b_testing') {
-                add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_styles'], 100, 0);
-                add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_scripts'], 100, 0);
+                if (self::get_page_slug() === 'admin.php?page=split_traffic_a_b_testing') {
+                    add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_styles'], 100, 0);
+                    add_action('admin_enqueue_scripts', [$this, 'enqueue_custom_admin_scripts'], 100, 0);
+                }
+                // Add settings link to plugin row
+                add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'my_plugin_settings_link']);
+
+                // Add settings link to plugin details
+                add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
             }
-            // Add settings link to plugin row
-            add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'my_plugin_settings_link']);
-
-            // Add settings link to plugin details
-            add_filter('plugin_row_meta', [$this, 'my_plugin_info_settings_link'], 10, 2);
-            
         }
-
         /**
          * my_plugin_info_settings_link is adding settings link row list to plugin info
          */
@@ -141,11 +144,11 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             ob_start();
 
-            if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic') {
+            if (self::get_page_slug() === 'control-djukovic') {
                 $args = [
                     'pointer' => 'control'
                 ];
-            } else  if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'experiment-a-djukovic') {
+            } else  if (self::get_page_slug() === 'experiment-a-djukovic') {
                 $args = [
                     'pointer' => 'experiment'
                 ];
@@ -223,14 +226,15 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
             // Define the field you want to retrieve
-            $desired_field = 'control_traffic_counter, experiment_traffic_counter, control_conversation_counter, experiment_conversation_counter, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry';
 
-            $db_return_values = $this->return_database_results($desired_field, 'get_results');
+            $db_return_values = $this->return_database_results(
+                [
+                    'desired_field' =>  'control_traffic_counter, experiment_traffic_counter, control_conversation_counter, experiment_conversation_counter, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
+                    'method' => 'get_results'
+                ]
+            );
 
-            $wpdb           = $db_return_values[0];
-            $table_name     = $db_return_values[1];
-            $sql            = $db_return_values[2];
-            $result         = $db_return_values[3];
+            $result         = $db_return_values->result;
 
             $args = [
                 'amount_for_unique_expiry'                  => $result[0]->amount_for_unique_expiry,
@@ -248,7 +252,7 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
             include_once plugin_dir_path(__FILE__) . 'templates/admin-template.php';
 
-            if (isset($_POST['submit'])) {
+            if (isset($_POST['submit'])  && !empty($_POST['submit'])) {
                 // Handle form submission
                 $this->handle_form_submission();
             }
@@ -257,96 +261,59 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         private function handle_form_submission()
         {
 
-            global $wpdb;
 
-            // Define your custom table name
-            $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
+            if (
+                (isset($_POST['amount_for_unique_expiry'])  && !empty($_POST['amount_for_unique_expiry'])) &&
+                (isset($_POST['unit_for_unique_expiry'])  && !empty($_POST['unit_for_unique_expiry']))
+            ) {
+                global $wpdb;
 
-            // Validate and sanitize form data
-            $data_to_update = [
-                'amount_for_unique_expiry'  => sanitize_text_field($_POST['amount_for_unique_expiry']),
-                'unit_for_unique_expiry'    => sanitize_text_field($_POST['unit_for_unique_expiry']),
+                // Define your custom table name
+                $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
 
-            ];
-
-            $where_condition = [
-                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-            ];
-
-            global $wpdb;
-
-            $table_name_unique = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME . '_unique_users';
-
-            $wpdb->update($table_name, $data_to_update, $where_condition);
+                // Validate and sanitize form data
+                $data_to_update = [
+                    'amount_for_unique_expiry'  => sanitize_text_field($_POST['amount_for_unique_expiry']),
+                    'unit_for_unique_expiry'    => sanitize_text_field($_POST['unit_for_unique_expiry']),
+                ];
 
 
-            if ($wpdb->last_error === '') {
-                $update_of_expiry_values = [
-                    'success' => true,
-                    'data' => [
-                        'updated' => $data_to_update
+
+                $this->update_database(['table_name' => 1,  'data_to_update' => $data_to_update]);
+
+
+                $db_return_values = $this->return_database_results(
+                    [
+                        'desired_field' => '*',
+                        'method' => 'get_results',
+                        'condition' => [
+                            'table_verison' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
+                        ],
+                        'unique_pointer' => true
                     ]
-                ];
-            } else {
+                );
 
-                $update_of_expiry_values = [
-                    'success' => false,
-                    'data' => [
-                        'updated' => $data_to_update
-                    ]
-                ];
-            }
+                $results = $db_return_values->results;
 
+                foreach ($results as $result) {
 
-            $sql = $wpdb->prepare("SELECT * FROM $table_name_unique WHERE `table_version` = %d", SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION);
-
-            $results = $wpdb->get_results($sql, OBJECT);
-
-            $update_inputed_expiry_times_array = [];
-
-            foreach ($results as $result) {
-
-                $currentDateTime = $result->created_at;
-
-                $data_to_update_unique = [
-                    'expiration_date'  => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . sanitize_text_field($_POST['amount_for_unique_expiry']) . ' ' . sanitize_text_field($_POST['unit_for_unique_expiry'])))
-                    // Add more fields as needed
-                ];
-
-                $where_condition_unique = [
-                    'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                    'id' =>  $result->id
-                ];
-                $wpdb->update($table_name_unique, $data_to_update_unique, $where_condition_unique);
-
-                if ($wpdb->last_error === '') {
-                    array_push($update_inputed_expiry_times_array, [
-                        'success' => true,
-                        'data' => [
-                            'updated' => [
-                                'condition' => $where_condition_unique,
-                                'updated_data' => $data_to_update_unique
+                    $this->update_database(
+                        [
+                            'table_name' => 2,
+                            'data_to_update' => [
+                                'expiration_date'  => date('Y-m-d H:i:s', strtotime($result->created_at . ' +' . sanitize_text_field($_POST['amount_for_unique_expiry']) . ' ' . sanitize_text_field($_POST['unit_for_unique_expiry'])))
+                            ],
+                            'where_condition' => [
+                                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
+                                'id' =>  $result->id
                             ]
                         ]
-                    ]);
-                } else {
-
-                    array_push($update_inputed_expiry_times_array, [
-                        'success' => false,
-                        'data' => [
-                            'updated' => [
-                                'condition' => $where_condition_unique,
-                                'updated_data' => $data_to_update_unique
-                            ]
-                        ]
-                    ]);
+                    );
                 }
-            }
 
-            wp_send_json([
-                'update_of_expiry_values'               => $update_of_expiry_values ?? ['not_present' => true],
-                'update_inputed_expiry_times_array'     => $update_inputed_expiry_times_array ?? ['not_present' => true]
-            ]);
+                wp_redirect(admin_url('admin.php?page=split_traffic_a_b_testing'));
+                exit();
+            }
         }
 
         /**
@@ -383,284 +350,227 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
         public function conversation_counter_fetch()
         {
-            // Your form processing logic goes here
-            $form_data = sanitize_text_field($_POST['conversation_pointer']);
 
-            // Perform actions with $form_data
+            if (isset($_POST['conversation_pointer']) && !empty($_POST['conversation_pointer'])) {
+                // Your form processing logic goes here
+                $form_data = sanitize_text_field($_POST['conversation_pointer']);
 
-            $page_pointer = 'control_conversation_counter';
+                // Perform actions with $form_data
 
-            global $wpdb;
+                $username = wp_get_current_user()->user_login;
 
-
-            // Define the field you want to retrieve
-            $desired_field = 'control_conversation_counter, experiment_conversation_counter, table_version, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry';
-
-            $db_return_values = $this->return_database_results($desired_field, 'get_results');
-
-
-            $wpdb           = $db_return_values[0];
-            $table_name     = $db_return_values[1];
-            $sql            = $db_return_values[2];
-            $result         = $db_return_values[3];
-
-
-            $amount_for_unique_expiry = $result[0]->amount_for_unique_expiry;
-
-            $unit_for_unique_expiry = $result[0]->unit_for_unique_expiry;
-
-
-            $control_conversation_counter = $result[0]->control_conversation_counter;
-
-            $experiment_conversation_counter = $result[0]->experiment_conversation_counter;
-
-
-            $control_unique_conversation_counter = $result[0]->control_unique_conversation_counter;
-
-            $experiment_unique_conversation_counter = $result[0]->experiment_unique_conversation_counter;
-
-
-            if ($form_data === 'control') {
-                $data_to_update = [
-                    'control_conversation_counter' => $control_conversation_counter + 1
-                ];
-            } else if ($form_data === 'experiment') {
-                $page_pointer = 'experiment_conversation_counter';
-                $data_to_update = [
-                    'experiment_conversation_counter' => $experiment_conversation_counter + 1
-                ];
-            }
-
-            $where_condition = [
-                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-            ];
-
-            $wpdb->update($table_name, $data_to_update, $where_condition);
-            // Check if the update was successful
-
-            if ($wpdb->last_error === '') {
-                $regular_conversation_array = [
-                    'success' => true,
-                    'data' => [
-                        'updated' => $page_pointer
-                    ]
-                ];
-            } else {
-
-                $regular_conversation_array = [
-                    'success' => false
-                ];
-            }
-
-            // Define the field you want to retrieve
-            $desired_field_unique = 'username, expiration_date, created_at';
-            $username = wp_get_current_user()->user_login;
-            $condition = "table_version=" . SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION . " AND username='" . $username . "'";
-
-            $db_return_values_unique = $this->return_database_results($desired_field_unique, 'get_results', $condition, true);
-
-            $wpdb_unique           = $db_return_values_unique[0];
-            $table_name_unique     = $db_return_values_unique[1];
-            $sql_unique            = $db_return_values_unique[2];
-            $result_unique         = $db_return_values_unique[3];
-
-            $currentDateTime = date('Y-m-d H:i:s');
-            print_r($result_unique);
-            if (empty($result_unique)) {
-
-                $wpdb->insert(
-                    $table_name_unique,
+                $db_return_values = $this->return_database_results(
                     [
-                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                        'username' => $username,
-                        'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
-                        'created_at' => $currentDateTime
-
+                        'desired_field' =>  'control_conversation_counter, experiment_conversation_counter, table_version, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
+                        'method' => 'get_results'
                     ]
                 );
 
+                $result         = $db_return_values->result;
+
+
+                $amount_for_unique_expiry = $result[0]->amount_for_unique_expiry;
+
+                $unit_for_unique_expiry = $result[0]->unit_for_unique_expiry;
+
+
+                $control_conversation_counter = $result[0]->control_conversation_counter;
+
+                $experiment_conversation_counter = $result[0]->experiment_conversation_counter;
+
+
+                $control_unique_conversation_counter = $result[0]->control_unique_conversation_counter;
+
+                $experiment_unique_conversation_counter = $result[0]->experiment_unique_conversation_counter;
+
+
                 if ($form_data === 'control') {
-                    $page_pointer = 'unique_empty_control_conversation_counter';
+
                     $data_to_update = [
-                        'control_unique_conversation_counter' => $control_unique_conversation_counter + 1
+                        'control_conversation_counter' => $control_conversation_counter + 1
                     ];
                 } else if ($form_data === 'experiment') {
-                    $page_pointer = 'unique_empty_experiment_conversation_counter';
+
                     $data_to_update = [
-                        'experiment_unique_conversation_counter' => $experiment_unique_conversation_counter + 1
+                        'experiment_conversation_counter' => $experiment_conversation_counter + 1
                     ];
                 }
 
-                $where_condition = [
-                    'table_version' =>  SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-                ];
+                $this->update_database(
+                    [
+                        'table_name' => 1,
+                        'data_to_update' => $data_to_update
+                    ]
+                );
 
-                $wpdb->update($table_name, $data_to_update, $where_condition);
+                $db_return_values_unique = $this->return_database_results(
+                    [
+                        'desired_field' =>  'username, expiration_date, created_at',
+                        'method' => 'get_results',
+                        'condition' => ['table_verison' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION, 'username' => $username],
+                        'unique_pointer' => true
+                    ]
+                );
 
-                if ($wpdb->last_error === '') {
-                    $empty_unique_conversation_array = [
-                        'success' => true,
-                        'data' => [
-                            'updated' => $page_pointer
+                $result_unique         = $db_return_values_unique->result;
+
+                $currentDateTime = date('Y-m-d H:i:s');
+
+                if (empty($result_unique)) {
+
+                    $this->insert_to_database(
+                        [
+                            'table_name' => 2,
+                            'data_to_insert' => [
+                                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
+                                'username' => $username,
+                                'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
+                                'created_at' => $currentDateTime
+
+                            ]
                         ]
-                    ];
-                } else {
-
-                    $empty_unique_conversation_array = [
-                        'success' => false
-                    ];
-                }
-            } else {
-
-                $expiration_date = strtotime($result_unique[0]->expiration_date);
-                $currentTimestamp = time();
-
-                if ($expiration_date < $currentTimestamp) {
+                    );
 
                     if ($form_data === 'control') {
-                        $page_pointer = 'unique_not_empty_control_conversation_counter';
+
                         $data_to_update = [
                             'control_unique_conversation_counter' => $control_unique_conversation_counter + 1
                         ];
-
-                        $data_to_update_unique = [
-                            'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
-                            'created_at' => $currentDateTime
-                        ];
                     } else if ($form_data === 'experiment') {
-                        $page_pointer = 'unique_not_empty_experiment_conversation_counter';
+
                         $data_to_update = [
                             'experiment_unique_conversation_counter' => $experiment_unique_conversation_counter + 1
                         ];
-
-                        $data_to_update_unique = [
-                            'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
-                            'created_at' => $currentDateTime
-                        ];
                     }
 
-                    $where_condition = [
-                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-                    ];
+                    $this->update_database(
+                        [
+                            'table_name' => 1,
+                            'data_to_update' => $data_to_update
+                        ]
+                    );
 
-                    $wpdb->update($table_name, $data_to_update, $where_condition);
+                } else {
 
-                    $where_condition_unique = [
-                        'username' => $username,
-                        'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-                    ];
-                    $wpdb->update($table_name_unique, $data_to_update_unique, $where_condition_unique);
+                    $expiration_date = strtotime($result_unique[0]->expiration_date);
+                    $currentTimestamp = time();
 
-                    if ($wpdb->last_error === '') {
-                        $not_empty_unique_conversation_array = [
-                            'success' => true,
-                            'data' => [
-                                'updated' => $page_pointer
+                    if ($expiration_date < $currentTimestamp) {
+
+                        if ($form_data === 'control') {
+
+                            $data_to_update = [
+                                'control_unique_conversation_counter' => $control_unique_conversation_counter + 1
+                            ];
+
+                            $data_to_update_unique = [
+                                'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
+                                'created_at' => $currentDateTime
+                            ];
+                        } else if ($form_data === 'experiment') {
+
+                            $data_to_update = [
+                                'experiment_unique_conversation_counter' => $experiment_unique_conversation_counter + 1
+                            ];
+
+                            $data_to_update_unique = [
+                                'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
+                                'created_at' => $currentDateTime
+                            ];
+                        }
+
+                        $this->update_database(
+                            [
+                                'table_name' => 1,
+                                'data_to_update' => $data_to_update
                             ]
-                        ];
-                    } else {
+                        );
 
-                        $not_empty_unique_conversation_array = [
-                            'success' => false
-                        ];
+                        $this->update_database(
+                            [
+                                'table_name' => 2,
+                                'data_to_update' => $data_to_update_unique,
+                                'where_condition' => [
+                                    'username' => $username,
+                                    'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
+                                ]
+                            ]
+                        );
+
                     }
                 }
+
+                wp_die();
             }
-
-            wp_send_json([
-                'regular_conversation_array'            => $regular_conversation_array ?? ['not_present' => true],
-                'empty_unique_conversation_array'       => $empty_unique_conversation_array ?? ['not_present' => true],
-                'not_empty_unique_conversation_array'   => $not_empty_unique_conversation_array ?? ['not_present' => true]
-            ]);
-
-            wp_die();
         }
 
         public function page_traffic_counter()
         {
 
-            $page_pointer = 'control_traffic_counter';
+            $db_return_values = $this->return_database_results(
+                [
+                    'desired_field' => 'control_traffic_counter, experiment_traffic_counter',
+                    'method'        => 'get_results'
+                ]
+            );
 
-            $desired_field = 'control_traffic_counter, experiment_traffic_counter';
+            $result = $db_return_values->result[0];
 
-            $db_return_values = $this->return_database_results($desired_field, 'get_results');
+            $control_traffic_counter    = $result->control_traffic_counter;
+            $experiment_traffic_counter = $result->experiment_traffic_counter;
 
-            $wpdb           = $db_return_values[0];
-            $table_name     = $db_return_values[1];
-            $sql            = $db_return_values[2];
-            $result         = $db_return_values[3];
-
-            $control_traffic_counter = $result[0]->control_traffic_counter;
-            $experiment_traffic_counter = $result[0]->experiment_traffic_counter;
-
-            if (basename(esc_url(home_url($_SERVER['REQUEST_URI']))) === 'control-djukovic') {
+            if (self::get_page_slug() === 'control-djukovic') {
                 $data_to_update = [
                     'control_traffic_counter' => $control_traffic_counter + 1
                 ];
-            } else {
-                $page_pointer = 'experiment_traffic_counter';
+            } else if (self::get_page_slug() === 'experiment-a-djukovic') {
                 $data_to_update = [
                     'experiment_traffic_counter' => $experiment_traffic_counter + 1
                 ];
             }
 
-            $where_condition = [
-                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-            ];
-
-            $wpdb->update($table_name, $data_to_update, $where_condition);
-
-            // Check if the update was successful
-            if ($wpdb->last_error === '') {
-                //echo 'Field ' . $page_pointer . ' updated successfully.';
-            } else {
-                echo 'Error updating ' . $page_pointer . ' field: ' . $wpdb->last_error;
-            }
+            $this->update_database(
+                [
+                    'table_name' => 1,
+                    'data_to_update' => $data_to_update
+                ]
+            );
         }
 
         public function redirect_a_b()
         {
 
+            $db_return_values = $this->return_database_results(
+                [
+                    'desired_field' => 'next_redirect',
+                    'method' => 'get_var'
+                ]
+            );
 
-            $query = self::prepare_query_args(basename(esc_url(home_url($_SERVER['REQUEST_URI']))));
-
-            $desired_field = 'next_redirect';
-
-            $db_return_values = $this->return_database_results($desired_field, 'get_var');
-
-
-            $wpdb           = $db_return_values[0];
-            $table_name     = $db_return_values[1];
-            $sql            = $db_return_values[2];
-            $result         = $db_return_values[3];
-
+            $result = $db_return_values->result;
 
             if ($result === 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING) {
                 $data_to_update = [
-                    $desired_field => 'Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
+                    'next_redirect' => 'Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
                 ];
-            } else {
+            } else if ($result === 'Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING) {
                 $data_to_update = [
-                    $desired_field => 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
+                    'next_redirect' => 'Control - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING
                 ];
             }
 
-            $where_condition = [
-                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-            ];
+            $this->update_database(
+                [
+                    'table_name' => 1,
+                    'data_to_update' => $data_to_update
+                ]
+            );
 
-            $wpdb->update($table_name, $data_to_update, $where_condition);
-
-
-            // Check if the update was successful
-            if ($wpdb->last_error === '') {
-                //echo 'Field next_redirect updated successfully.';
-            } else {
-                echo 'Error updating next_redirect field: ' . $wpdb->last_error;
-            }
+            $query = self::prepare_query_args(self::get_page_slug());
 
             if ($query->post->post_title === $result) {
-                $page = get_page_by_path($wpdb->get_var($sql));
+
+                $page = get_page_by_path('Experiment A - ' . SPLIT_TRAFFIC_A_B_TESTING_LASTNAME_STRING);
 
                 $page_url = get_permalink($page->ID);
 

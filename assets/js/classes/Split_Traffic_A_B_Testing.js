@@ -31,7 +31,7 @@ export default class Split_Traffic_A_B_Testing {
                 method: 'POST',
                 body: data,
             }).then(
-                response => response.json()
+                response => response.text()
             ).then(data => {
                 console.log(data)
                 loadingDialog.close()

@@ -57,7 +57,7 @@
     <br>
 
 
-    <div class="df aic g2 b1 p1rem">
+    <form method="post" id="expiry_form" class="df aic g2 b1 p1rem">
 
         <div class="df fdc p1dot5rem b1 f1">
             <label for="amount_for_unique_expiry"><?php _e('Select amount of units for unique expiry:', 'split_traffic_a_b_testing') ?>
@@ -81,11 +81,14 @@
 
             </select>
         </div>
-        <input type="button" value="<?php _e('Submit', 'split_traffic_a_b_testing') ?>" class="f1 button button-primary button-large" id="submit_new_values_for_expiry">
+
+        <?php wp_nonce_field('my_custom_form_nonce', 'my_custom_form_nonce'); ?>
+
+        <input type="submit" value="<?php _e('Submit', 'split_traffic_a_b_testing') ?>" class="f1 button button-primary button-large" id="submit_new_values_for_expiry">
 
 
 
-    </div>
+    </form>
 
     <dialog id="loadingDialog">
 
