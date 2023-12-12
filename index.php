@@ -38,13 +38,16 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
         public function __construct()
         {
+
+            $this->define_constants();
+
             if (
                 self::get_page_slug() === 'control-djukovic' ||
                 self::get_page_slug() === 'experiment-a-djukovic' ||
                 self::get_page_slug() === 'admin.php?page=split_traffic_a_b_testing' ||
                 self::get_page_slug() === 'admin-ajax.php'
             ) {
-                $this->define_constants();
+
 
                 add_action('plugins_loaded',  [$this, 'split_traffic_a_b_testing_plugin_load_textdomain'], 100, 0);
 
@@ -449,7 +452,6 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                             'data_to_update' => $data_to_update
                         ]
                     );
-
                 } else {
 
                     $expiration_date = strtotime($result_unique[0]->expiration_date);
@@ -496,7 +498,6 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                                 ]
                             ]
                         );
-
                     }
                 }
 
