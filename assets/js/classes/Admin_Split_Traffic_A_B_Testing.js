@@ -11,43 +11,74 @@ export default class Admin_Split_Traffic_A_B_Testing {
 
     submitForm = (event) => {
         document.querySelector('#submit_new_values_for_expiry').addEventListener('click', (event) => {
-            
+
             // Prevent the default form submission
             event.preventDefault();
 
-            let url = window.location.href
+            let url = event.currentTarget.closest('form').action
             let amount_for_unique_expiry = document.querySelector('#amount_for_unique_expiry').value
             let unit_for_unique_expiry = document.querySelector('#unit_for_unique_expiry').value
-            let nonce = document.querySelector('#expiry_form').elements['_wp_http_referer'].value
+            let admin_form_subbmision_nonce = document.querySelector('#expiry_form').elements['admin_form_subbmision_nonce'].value
 
-            let data = `amount_for_unique_expiry=${amount_for_unique_expiry}&unit_for_unique_expiry=${unit_for_unique_expiry}&nonce=${nonce}&submit=Submit`
+           
             let loadingDialog = document.querySelector('#loadingDialog')
 
             loadingDialog.showModal()
 
+
+            let data = new URLSearchParams({
+                admin_form_subbmision_nonce,
+                'action': 'admin_form_subbmision',
+                amount_for_unique_expiry,
+                unit_for_unique_expiry,
+            })
+
+          
+
+    
+
+            loadingDialog.showModal()
+
             fetch(url, {
-                "headers": {
-                    "content-type": "application/x-www-form-urlencoded",
-                },
-
-                "body": data,
-                "method": "POST",
-
-            }).then((response) => {
-                response.text()
-
-            }).then(data => {
-            
+                method: 'POST',
+                body: data,
+            }).then(
+                response => response.text()
+            ).then(data => {
+                console.log(data)
                 loadingDialog.close()
-
             }).catch((error) => {
                 console.error('Error:', error)
             }).finally(() => {
-
                 loadingDialog.close()
             })
+
+
+
+
+            /*   fetch(url, {
+                  "headers": {
+                      "content-type": "application/x-www-form-urlencoded",
+                  },
+  
+                  "body": data,
+                  "method": "POST",
+  
+              }).then((response) => {
+                  response.text()
+  
+              }).then(data => {
+              
+                  loadingDialog.close()
+  
+              }).catch((error) => {
+                  console.error('Error:', error)
+              }).finally(() => {
+  
+                  loadingDialog.close()
+              }) */
         })
-       
+
 
     }
 

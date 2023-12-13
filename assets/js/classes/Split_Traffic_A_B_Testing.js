@@ -10,11 +10,9 @@ export default class Split_Traffic_A_B_Testing {
     */
 
     setConversationEvent() {
-        document.getElementById('conversation_link').addEventListener('click', (e) => {
-
+        document.querySelector('#conversation_link')?.addEventListener('click', (e) => {
 
             e.preventDefault()
-
 
             let data = new URLSearchParams({
                 'action': 'conversation_counter_fetch',
@@ -38,7 +36,6 @@ export default class Split_Traffic_A_B_Testing {
             }).catch((error) => {
                 console.error('Error:', error)
             }).finally(() => {
-
                 loadingDialog.close()
             })
 

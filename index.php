@@ -71,6 +71,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
 
                 add_action('wp_ajax_conversation_counter_fetch', [$this, 'conversation_counter_fetch'], 100, 0);
 
+                add_action('wp_ajax_admin_form_subbmision', [$this, 'admin_form_subbmision'], 100, 0);
+
                 add_action('wp',  [$this, 'setWpAdminAjaxCookie'], 100, 0);
 
                 if (self::get_page_slug() === 'control-djukovic' || self::get_page_slug() === 'experiment-a-djukovic') {
@@ -238,10 +240,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             // Define the field you want to retrieve
 
             $db_return_values = $this->return_database_results(
-                [
-                    'desired_field' =>  'control_traffic_counter, experiment_traffic_counter, control_conversation_counter, experiment_conversation_counter, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
-                    'method' => 'get_results'
-                ]
+
+                desired_field: 'control_traffic_counter, experiment_traffic_counter, control_conversation_counter, experiment_conversation_counter, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
+                method: 'get_results'
+
             );
 
             $result         = $db_return_values->result;
@@ -257,29 +259,28 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 'control_conversation_counter'              => $result[0]->control_conversation_counter,
                 'experiment_conversation_counter'           => $result[0]->experiment_conversation_counter,
                 'control_unique_conversation_counter'       => $result[0]->control_unique_conversation_counter,
-                'experiment_unique_conversation_counter'    => $result[0]->experiment_unique_conversation_counter
+                'experiment_unique_conversation_counter'    => $result[0]->experiment_unique_conversation_counter,
+                'admin_form_subbmision_nonce'               => wp_create_nonce("admin_form_subbmision_nonce")
             ];
 
             include_once plugin_dir_path(__FILE__) . 'templates/admin-template.php';
-
-            if (isset($_POST['submit'])  && !empty($_POST['submit'])) {
-                // Handle form submission
-                $this->handle_form_submission();
-            }
         }
 
-        private function handle_form_submission()
+        public function admin_form_subbmision()
         {
 
+
+            if (!isset($_POST['admin_form_subbmision_nonce']) || !wp_verify_nonce($_POST['admin_form_subbmision_nonce'], 'admin_form_subbmision_nonce')) {
+                wp_send_json_error('invalid nonce');
+            }
+            if (!current_user_can('manage_options')) {
+                wp_send_json_error('invalid permissions');
+            }
 
             if (
                 (isset($_POST['amount_for_unique_expiry'])  && !empty($_POST['amount_for_unique_expiry'])) &&
                 (isset($_POST['unit_for_unique_expiry'])  && !empty($_POST['unit_for_unique_expiry']))
             ) {
-                global $wpdb;
-
-                // Define your custom table name
-                $table_name = $wpdb->prefix . SPLIT_TRAFFIC_A_B_TESTING_NAME;
 
                 // Validate and sanitize form data
                 $data_to_update = [
@@ -288,41 +289,35 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 ];
 
 
-
-                $this->update_database(['table_name' => 1,  'data_to_update' => $data_to_update]);
+                $this->update_database(
+                    table_name: 1,
+                    data_to_update: $data_to_update
+                );
 
 
                 $db_return_values = $this->return_database_results(
-                    [
-                        'desired_field' => '*',
-                        'method' => 'get_results',
-                        'condition' => [
-                            'table_verison' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-                        ],
-                        'unique_pointer' => true
-                    ]
+                    desired_field: '*',
+                    method: 'get_results',
+                    unique_pointer: true
                 );
 
-                $results = $db_return_values->results;
+                $results = $db_return_values->result;
 
                 foreach ($results as $result) {
 
                     $this->update_database(
-                        [
-                            'table_name' => 2,
-                            'data_to_update' => [
-                                'expiration_date'  => date('Y-m-d H:i:s', strtotime($result->created_at . ' +' . sanitize_text_field($_POST['amount_for_unique_expiry']) . ' ' . sanitize_text_field($_POST['unit_for_unique_expiry'])))
-                            ],
-                            'where_condition' => [
-                                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                                'id' =>  $result->id
-                            ]
+                        table_name: 2,
+                        data_to_update: [
+                            'expiration_date'  => date('Y-m-d H:i:s', strtotime($result->created_at . ' +' . sanitize_text_field($_POST['amount_for_unique_expiry']) . ' ' . sanitize_text_field($_POST['unit_for_unique_expiry'])))
+                        ],
+                        where_condition: [
+                            'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
+                            'id' =>  $result->id
                         ]
                     );
                 }
-
-                wp_redirect(admin_url('admin.php?page=split_traffic_a_b_testing'));
-                exit();
+                wp_send_json_success(data: ['message' => '✅ Nonce is valid! amount_for_unique_expiry & unit_for_unique_expiry is updated'], options: 1);
+              
             }
         }
 
@@ -370,10 +365,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 $username = wp_get_current_user()->user_login;
 
                 $db_return_values = $this->return_database_results(
-                    [
-                        'desired_field' =>  'control_conversation_counter, experiment_conversation_counter, table_version, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
-                        'method' => 'get_results'
-                    ]
+
+                    desired_field: 'control_conversation_counter, experiment_conversation_counter, table_version, control_unique_conversation_counter, experiment_unique_conversation_counter, amount_for_unique_expiry, unit_for_unique_expiry',
+                    method: 'get_results'
+
                 );
 
                 $result         = $db_return_values->result;
@@ -407,19 +402,17 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 }
 
                 $this->update_database(
-                    [
-                        'table_name' => 1,
-                        'data_to_update' => $data_to_update
-                    ]
+                    table_name: 1,
+                    data_to_update: $data_to_update
                 );
 
                 $db_return_values_unique = $this->return_database_results(
-                    [
-                        'desired_field' =>  'username, expiration_date, created_at',
-                        'method' => 'get_results',
-                        'condition' => ['table_verison' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION, 'username' => $username],
-                        'unique_pointer' => true
-                    ]
+
+                    desired_field: 'username, expiration_date, created_at',
+                    method: 'get_results',
+                    condition: ['table_verison' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION, 'username' => $username],
+                    unique_pointer: true
+
                 );
 
                 $result_unique         = $db_return_values_unique->result;
@@ -429,15 +422,13 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                 if (empty($result_unique)) {
 
                     $this->insert_to_database(
-                        [
-                            'table_name' => 2,
-                            'data_to_insert' => [
-                                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
-                                'username' => $username,
-                                'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
-                                'created_at' => $currentDateTime
+                        table_name: 2,
+                        data_to_insert: [
+                            'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION,
+                            'username' => $username,
+                            'expiration_date' => date('Y-m-d H:i:s', strtotime($currentDateTime . ' +' . $amount_for_unique_expiry . ' ' . $unit_for_unique_expiry)),
+                            'created_at' => $currentDateTime
 
-                            ]
                         ]
                     );
 
@@ -454,10 +445,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                     }
 
                     $this->update_database(
-                        [
-                            'table_name' => 1,
-                            'data_to_update' => $data_to_update
-                        ]
+                        table_name: 1,
+                        data_to_update: $data_to_update
                     );
                 } else {
 
@@ -489,20 +478,16 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
                         }
 
                         $this->update_database(
-                            [
-                                'table_name' => 1,
-                                'data_to_update' => $data_to_update
-                            ]
+                            table_name: 1,
+                            data_to_update: $data_to_update
                         );
 
                         $this->update_database(
-                            [
-                                'table_name' => 2,
-                                'data_to_update' => $data_to_update_unique,
-                                'where_condition' => [
-                                    'username' => $username,
-                                    'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
-                                ]
+                            table_name: 2,
+                            data_to_update: $data_to_update_unique,
+                            where_condition: [
+                                'username' => $username,
+                                'table_version' => SPLIT_TRAFFIC_A_B_TESTING_TABLE_VERSION
                             ]
                         );
                     }
@@ -516,10 +501,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         {
 
             $db_return_values = $this->return_database_results(
-                [
-                    'desired_field' => 'control_traffic_counter, experiment_traffic_counter',
-                    'method'        => 'get_results'
-                ]
+
+                desired_field: 'control_traffic_counter, experiment_traffic_counter',
+                method: 'get_results'
+
             );
 
             $result = $db_return_values->result[0];
@@ -538,10 +523,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
             $this->update_database(
-                [
-                    'table_name' => 1,
-                    'data_to_update' => $data_to_update
-                ]
+                table_name: 1,
+                data_to_update: $data_to_update
             );
         }
 
@@ -549,10 +532,10 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
         {
 
             $db_return_values = $this->return_database_results(
-                [
-                    'desired_field' => 'next_redirect',
-                    'method' => 'get_var'
-                ]
+
+                desired_field: 'next_redirect',
+                method: 'get_var'
+
             );
 
             $result = $db_return_values->result;
@@ -568,10 +551,8 @@ if (!class_exists('Split_Traffic_A_B_Testing')) {
             }
 
             $this->update_database(
-                [
-                    'table_name' => 1,
-                    'data_to_update' => $data_to_update
-                ]
+                table_name: 1,
+                data_to_update: $data_to_update
             );
 
             $query = self::prepare_query_args(self::get_page_slug());

@@ -57,7 +57,7 @@
     <br>
 
 
-    <form method="post" id="expiry_form" class="df aic g2 b1 p1rem">
+    <form method="post" action="<?php echo admin_url('admin-ajax.php') ?>" id="expiry_form" class="df aic g2 b1 p1rem">
 
         <div class="df fdc p1dot5rem b1 f1">
             <label for="amount_for_unique_expiry"><?php _e('Select amount of units for unique expiry:', 'split_traffic_a_b_testing') ?>
@@ -71,18 +71,18 @@
 
                 <?php
 
-                foreach ($args['unit_for_unique_expiry_types'] as $value) {
+                    foreach ($args['unit_for_unique_expiry_types'] as $value) {
 
-                    echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
-                }
+                        echo '<option value="' . $value . '"' . ($value === $args['unit_for_unique_expiry'] ? 'selected' : '') . '>' .  __(ucfirst($value), 'split_traffic_a_b_testing') . '</option>';
+                    }
 
                 ?>
 
 
             </select>
         </div>
+        <input type="hidden" name="admin_form_subbmision_nonce" id="admin_form_subbmision_nonce" value="<?php echo $args['admin_form_subbmision_nonce'] ?>">
 
-        <?php wp_nonce_field('my_custom_form_nonce', 'my_custom_form_nonce'); ?>
 
         <input type="submit" value="<?php _e('Submit', 'split_traffic_a_b_testing') ?>" class="f1 button button-primary button-large" id="submit_new_values_for_expiry">
 
