@@ -33,10 +33,6 @@ export default class Admin_Split_Traffic_A_B_Testing {
                 unit_for_unique_expiry,
             })
 
-          
-
-    
-
             loadingDialog.showModal()
 
             fetch(url, {
@@ -53,30 +49,6 @@ export default class Admin_Split_Traffic_A_B_Testing {
                 loadingDialog.close()
             })
 
-
-
-
-            /*   fetch(url, {
-                  "headers": {
-                      "content-type": "application/x-www-form-urlencoded",
-                  },
-  
-                  "body": data,
-                  "method": "POST",
-  
-              }).then((response) => {
-                  response.text()
-  
-              }).then(data => {
-              
-                  loadingDialog.close()
-  
-              }).catch((error) => {
-                  console.error('Error:', error)
-              }).finally(() => {
-  
-                  loadingDialog.close()
-              }) */
         })
 
 

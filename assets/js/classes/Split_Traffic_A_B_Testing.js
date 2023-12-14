@@ -14,12 +14,19 @@ export default class Split_Traffic_A_B_Testing {
 
             e.preventDefault()
 
+            let conversationForm = document.querySelector('#conversation_form')
+            
+            let conversation_pointer =  conversationForm.elements['conversation_pointer'].value
+            let conversation_subbmision_nonce = conversationForm['conversation_subbmision_nonce'].value
             let data = new URLSearchParams({
                 'action': 'conversation_counter_fetch',
-                'conversation_pointer': e.currentTarget.dataset.conversationPointer,
+                conversation_pointer,
+                conversation_subbmision_nonce
+                
             })
-
-            let url = this.getCookie('wpAdminAjaxUrl')
+            
+    
+            let url = conversationForm.action
 
             let loadingDialog = document.querySelector('#loadingDialog')
 
